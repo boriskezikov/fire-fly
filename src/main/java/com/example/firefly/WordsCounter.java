@@ -35,29 +35,19 @@ public class WordsCounter {
     private final RestTemplate restTemplate;
 
     private final ConcurrentHashMap<String, Integer> wordCountMap = new ConcurrentHashMap<>();
-    private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     private final AtomicInteger completedTasks = new AtomicInteger();
 
+    @PostConstruct
     @SneakyThrows
-    @Async
     public void countTop10Words() {
         int totalTasks = articlesCache.getSize();
-        CountDownLatch latch = new CountDownLatch(totalTasks);
 
         while (articlesCache.getSize() > 0) {
             String next = articlesCache.getNext();
-            executor.submit(() -> {
-                processArticle(next);
-                latch.countDown();
-                int tasksCompleted = completedTasks.incrementAndGet();
-                int tasksLeft = totalTasks - tasksCompleted;
-                log.info("Tasks completed: {}, tasks left: {}", tasksCompleted, tasksLeft);
-            });
+            processArticle(next);
+            totalTasks--;
+            log.info("Total tasks left: {}", totalTasks);
         }
-
-        latch.await();
-        executor.shutdown();
-
         printTop10Words();
     }
 
