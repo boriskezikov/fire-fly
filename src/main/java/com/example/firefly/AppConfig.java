@@ -1,12 +1,17 @@
 package com.example.firefly;
 
+import static com.example.firefly.UserAgentStringGenerator.generateUserAgent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +24,30 @@ public class AppConfig {
         RestTemplate restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
         List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
 
-        // Add custom User-Agent interceptor
         interceptors.add((request, body, execution) -> {
-            request.getHeaders().set(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3");
+            String userAgent = generateUserAgent();
+            request.getHeaders().set(HttpHeaders.USER_AGENT, userAgent);
             return execution.execute(request, body);
         });
 
         restTemplate.setInterceptors(interceptors);
         return restTemplate;
     }
+
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder()
+                .defaultHeader(HttpHeaders.USER_AGENT, generateUserAgent())
+                .clientConnector(new ReactorClientHttpConnector(
+                        HttpClient.create().followRedirect(true)
+                ))
+                .exchangeStrategies(ExchangeStrategies
+                        .builder()
+                        .codecs(codecs -> codecs
+                                .defaultCodecs()
+                                .maxInMemorySize(500 * 1024))
+                        .build())
+                .build();
+    }
+
 }
