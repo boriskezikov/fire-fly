@@ -17,10 +17,12 @@ public class FireFlyApplication implements CommandLineRunner {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(FireFlyApplication.class, args);
         context.close();
+        log.info("Application finished");
     }
 
     @Override
     public void run(String... args) {
+        log.info("Start counting words...");
         wordsCounterService.countTop10Words();
     }
 }
