@@ -12,7 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 @RequiredArgsConstructor
 public class FireFlyApplication implements CommandLineRunner {
 
-    private final WordsCounter wordsCounter;
+    private final WordsCounterService wordsCounterService;
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(FireFlyApplication.class, args);
@@ -21,6 +21,6 @@ public class FireFlyApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        wordsCounter.countTop10Words();
+        wordsCounterService.countTop10Words();
     }
 }

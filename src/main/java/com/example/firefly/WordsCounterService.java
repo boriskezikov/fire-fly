@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class WordsCounter {
+public class WordsCounterService {
 
     private final ArticlesCache articlesCache;
     private final WordBankCache wordBankCache;
@@ -66,7 +66,7 @@ public class WordsCounter {
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty())
                 .bodyToMono(String.class)
                 .publishOn(Schedulers.parallel())
-                .flatMapMany(WordsCounter::processHtml)
+                .flatMapMany(WordsCounterService::processHtml)
                 .retryWhen(getRetrySpec(articleUrl))
                 .onErrorResume(Error999Exception.class, error -> Flux.empty())
                 .doOnError(error -> log.error("Error loading article {}", error.getMessage()));
