@@ -1,4 +1,4 @@
-package com.example.firefly;
+package com.example.firefly.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;

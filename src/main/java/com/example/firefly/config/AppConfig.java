@@ -1,6 +1,6 @@
-package com.example.firefly;
+package com.example.firefly.config;
 
-import static com.example.firefly.UserAgentStringGenerator.generateUserAgent;
+import static com.example.firefly.utils.UserAgentStringGenerator.generateUserAgent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;

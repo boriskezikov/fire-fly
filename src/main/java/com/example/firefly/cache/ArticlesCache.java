@@ -1,7 +1,8 @@
-package com.example.firefly;
+package com.example.firefly.cache;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -18,12 +19,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ArticlesCache {
 
     private static final String filePath = "src/main/resources/articles.txt";
-    private final ConcurrentLinkedQueue<String> articles;
+    private final ConcurrentLinkedQueue<String> articles = new ConcurrentLinkedQueue<>();
 
-
-    public ArticlesCache() {
-        articles = new ConcurrentLinkedQueue<>();
-    }
+    @Value("${articles.batchSize}")
+    private Integer batchSize;
 
     @PostConstruct
     public void loadFromFile() {
@@ -32,7 +31,7 @@ public class ArticlesCache {
         int count = 0;
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String line;
-            while ((line = reader.readLine()) != null && count < 1000){
+            while ((line = reader.readLine()) != null && count < batchSize){
                 String articleUrl = line.trim().toLowerCase();
                 articles.add(articleUrl);
                 count++;

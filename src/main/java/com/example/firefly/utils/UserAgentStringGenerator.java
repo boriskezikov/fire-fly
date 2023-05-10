@@ -1,4 +1,4 @@
-package com.example.firefly;
+package com.example.firefly.utils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
