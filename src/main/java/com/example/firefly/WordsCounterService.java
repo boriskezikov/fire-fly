@@ -84,19 +84,19 @@ public class WordsCounterService {
                 });
     }
 
-    private static CorePublisher<String> processHtml(String htmlContent) {
+    private static Flux<String> processHtml(String htmlContent) {
         if (htmlContent == null) {
-            return Mono.empty();
+            return Flux.empty();
         }
         Document doc = Jsoup.parse(htmlContent);
         Element scriptElement = doc.select("script[type=application/ld+json]").first();
 
         if (htmlContent.contains("999 Unable to process request at this time")) {
-            return Mono.error(new Error999Exception("Error 999 encountered"));
+            return Flux.error(new Error999Exception("Error 999 encountered"));
         }
 
         if (scriptElement == null) {
-            return Mono.empty();
+            return Flux.empty();
         }
         String scriptContent = scriptElement.html();
 
